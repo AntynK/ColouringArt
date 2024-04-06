@@ -1,11 +1,14 @@
 import pickle
 from pathlib import Path
 
-from .file_checker import get_file_hash
-from .pickart.pickart_file import PickartFile, RestrictedUnpickler
-from .static_variables import ARTS_DIR
+from pickart import PickartFile
 
-DB_FILE = Path(f"{ARTS_DIR}\\progress.dat")
+from engine.file_checker import get_file_hash
+from engine.static_variables import ARTS_DIR
+from engine.restricted_unpickler import RestrictedUnpickler
+
+
+DB_FILE = Path(ARTS_DIR, "progress.dat")
 
 
 def load_progress() -> dict[str, float]:
@@ -22,7 +25,7 @@ def save_progress_rate(data: dict):
         pickle.dump(data, file)
 
 
-def delete_progress_rate(filepath: str):
+def delete_progress_rate(filepath: Path):
     db_data: dict[str, float] = load_progress()
     file_hash: str = get_file_hash(filepath)
     if file_hash not in db_data:
@@ -31,7 +34,7 @@ def delete_progress_rate(filepath: str):
     save_progress_rate(db_data)
 
 
-def get_progress_rate(filepath: str) -> float:
+def get_progress_rate(filepath: Path) -> float:
     db_data: dict[str, float] = load_progress()
 
     file_hash: str = get_file_hash(filepath)

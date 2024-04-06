@@ -1,8 +1,8 @@
 import pygame
 
-from ..colors import BLACK_COLOR
-from ..static_variables import FONTS_DIR
-from ..image.load import extract_file
+from engine.colours import BLACK_COLOUR
+from engine.static_variables import Fonts
+from engine.assets import load_font
 
 
 class Text:
@@ -17,24 +17,16 @@ class Text:
 
         self.text = text
         self.font_size = font_size
-        try:
-            self.font = pygame.font.Font(
-                f"{FONTS_DIR}\\Silkscreen-Regular.ttf", font_size
-            )
-        except Exception:
-            extract_file(f"{FONTS_DIR}\\Silkscreen-Regular.ttf")
-            self.font = pygame.font.Font(
-                f"{FONTS_DIR}\\Silkscreen-Regular.ttf", font_size
-            )
+        self.font = load_font(Fonts.SILKSCREEN_REGULAR, font_size)
 
-        self.render_text()
+        self._render_text()
 
-    def render_text(self):
-        self.rendered_text = self.font.render(self.text, True, BLACK_COLOR)
+    def _render_text(self):
+        self.rendered_text = self.font.render(self.text, True, BLACK_COLOUR)
 
     def update_text(self, text: str):
         self.text = text
-        self.render_text()
+        self._render_text()
 
     def draw(self, display: pygame.surface.Surface):
         display.blit(self.rendered_text, (self.x, self.y))

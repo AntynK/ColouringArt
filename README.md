@@ -1,36 +1,45 @@
 # Colouring art
+#### [Українська версія](README_UA.md)
+
 It is a simple time killer game, in which you have to paint an image.
 
 ## Setup
-Firstly you need to download Colouring art.exe(or source code) and assets.bak file, after that run .exe file or source code(file colouring_art.pyw), the game will create some folders.
+Firstly you need to download `Colouring art.exe`(or source code) and `assets.bak` file, after that run .exe file or source code(`colouring_art.pyw`), the game will create some folders.
+
+File `assets.bak` must be in the same folder as game. This file constains all fonts and images for game.
 
 In the game by default there are 2 images, but you can add your images.
-(They are in the arts folder).
 
 ## Adding custom images
-You can use the Art convertor.exe(or art_converter.py) utility, it is a simple console program which by default converts images from input folder to output folder. You can change the input folder with flag -i and the output folder with flag -o(output directory will be created automatically if it does not exist).
+You can use [pickart](https://pypi.org/project/Pickart/) module to convert PNG files.
+Put converted images(.pickart) in categories folder(`arts\<category_name>`).
 
-## About .pickart file
-Game uses .pickart files(pick - name of python built-in module [pickle](https://docs.python.org/3.9/library/pickle.html)), files are compressed with [gzip](https://docs.python.org/3.9/library/gzip.html).
+## Adding custom categories
+By default game has one category `plants` with two images. You can change existing category or add new one.
 
-File structure:
+### Category structure
+All categories are located in `arts` folder.
+
 ```
+<category_name>
+    |-icon.png
+    |-style.json
+    |-*.pickart
+```
+`icon.png` - image that will be displayed on main window. If it is omitted game will use default image.
+
+`style.json` - category style. Configures background colour.
+
+`*.pickart` - [Pickart file](https://pypi.org/project/Pickart/) with any name(with extension `.pickart`). Category can have multiple `*.pickart` files.
+
+### `style.json` file structure
+```Python
 {
-    "info":{
-        "size": (1, 1),
-        "version": 1
-    },
-    "palette":[(int, int, int), ...],
-    "pixels": [
-        [(color_index, is_painted), ...]
-    ]
+    "bg": [red, green, blue, alpha]
 }
 ```
-"info" contains the size of image and version of file.
+`bg` - list of integers in range from 0 to 255(including). `alpha` - optional.
 
-"palette" contains tuples with 3 ints (r, g, b), they must be less or equal 255 and bigger or equal 0.
-
-"pixels" is a 2d array which contains color_index(int) and painted(bool).
 
 ## Security
 [Pickle](https://docs.python.org/3.9/library/pickle.html) module has security issues, the game does not use standard pickle.load(), instead it uses [restricted loader](https://docs.python.org/3/library/pickle.html#restricting-globals) which blocks all external classes.

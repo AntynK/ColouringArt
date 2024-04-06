@@ -1,13 +1,13 @@
-from typing import Optional
 from enum import Enum
+from pathlib import Path
+from typing import Optional
 
 import pygame
 
-from .text import Text
-
-from ..static_variables import ICONS_DIR, IMAGE_SIZE
-from ..image.load import load_from_assets
-from ..colors import CATEGORY_COLOR
+from engine.menu_elems import Text
+from engine.static_variables import IMAGE_SIZE, Icons
+from engine.assets import load_image
+from engine.colours import CATEGORY_COLOUR
 
 
 class ButtonResponses(Enum):
@@ -21,7 +21,7 @@ class ArrowButton:
         x: int,
         y: int,
         text: Optional[str] = None,
-        icon_path: Optional[str] = None,
+        icon_path: Optional[Path] = None,
         width: int = 0,
         draw_bg: bool = True,
     ) -> None:
@@ -34,11 +34,9 @@ class ArrowButton:
         if text:
             self._middle = Text(x + IMAGE_SIZE + 5, y - 1, text)
         elif icon_path:
-            self._middle = load_from_assets(icon_path)
+            self._middle = load_image(icon_path)
 
-        self._left_arrow: pygame.surface.Surface = load_from_assets(
-            f"{ICONS_DIR}\\arrow.png"
-        )
+        self._left_arrow: pygame.surface.Surface = load_image(Icons.ARROW)
         self._right_arrow = pygame.transform.rotate(self._left_arrow, 180)
 
         self._left_rect = pygame.Rect(x, y, *self._left_arrow.get_size())
@@ -55,8 +53,8 @@ class ArrowButton:
         self._right_arrow.set_alpha(alpha)
         self._left_arrow.set_alpha(alpha)
 
-    def set_image(self, image_path: str):
-        self._middle = load_from_assets(image_path, True)
+    def set_image(self, image_path: Path):
+        self._middle = load_image(image_path, is_external=True)
 
     def set_text(self, text: str):
         if not isinstance(self._middle, Text):
@@ -70,13 +68,11 @@ class ArrowButton:
         if self.draw_bg:
             pygame.draw.rect(
                 display,
-                CATEGORY_COLOR,
+                CATEGORY_COLOUR,
                 (0, self.y - 10, display.get_width(), self._left_rect.width + 20),
             )
-        if self._active:
-            self._set_button_active(255)
-        else:
-            self._set_button_active(100)
+
+        self._set_button_active(255 if self._active else 100)
 
         if isinstance(self._middle, Text):
             self._middle.draw(display)

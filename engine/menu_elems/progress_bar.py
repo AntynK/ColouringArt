@@ -1,6 +1,6 @@
 import pygame
 
-from ..colors import CATEGORY_COLOR, LIGHT_GRAY_COLOR
+from engine.colours import CATEGORY_COLOUR, LIGHT_GRAY_COLOUR
 
 
 class ProgressBar:
@@ -23,14 +23,14 @@ class ProgressBar:
 
         pygame.draw.rect(
             display,
-            LIGHT_GRAY_COLOR,
+            LIGHT_GRAY_COLOUR,
             (self.x, self.y, self.width, 10),
             border_radius=10,
         )
 
         pygame.draw.rect(
             display,
-            CATEGORY_COLOR,
+            CATEGORY_COLOUR,
             (self.x, self.y, self.progress_width, 10),
             border_radius=10,
         )

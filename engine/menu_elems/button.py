@@ -1,18 +1,16 @@
 from typing import Callable
+from pathlib import Path
 
 import pygame
 
-from ..static_variables import ICONS_DIR
-from ..image.load import load_from_assets
+from engine.assets import load_image
 
 
 class Button:
-    def __init__(self, x: int, y: int, icon_name: str, callback: Callable) -> None:
+    def __init__(self, x: int, y: int, icon_path: Path, callback: Callable) -> None:
         self.x, self.y = x, y
 
-        self.icon: pygame.surface.Surface = load_from_assets(
-            f"{ICONS_DIR}\\{icon_name}.png"
-        )
+        self.icon: pygame.surface.Surface = load_image(icon_path)
         self.callback = callback
         self.rect = pygame.Rect(x, y, *self.icon.get_size())
         self.pressed = False

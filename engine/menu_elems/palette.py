@@ -1,13 +1,12 @@
 import pygame
+from pickart import Colour
 
-from .palette_color import PaletteColor
-from .arrow_btns import ArrowButton, ButtonResponses
-
-from ..colors import GRAY_COLOR
+from engine.menu_elems import PaletteColour, ArrowButton, ButtonResponses
+from engine.colours import GRAY_COLOUR
 
 
 class Palette:
-    def __init__(self, palette: dict) -> None:
+    def __init__(self, palette: dict[int, Colour]) -> None:
         self.palette = palette
         self.palette_size = 20
 
@@ -17,18 +16,18 @@ class Palette:
         self._load_pages()
 
         self._selected_page_index = 0
-        self._selected_color = 0
-        self._selected_color_page = 0
-        self._selected_page: list[PaletteColor] = self.pages[self._selected_page_index]
+        self._selected_colour = 0
+        self._selected_colour_page = 0
+        self._selected_page: list[PaletteColour] = self.pages[self._selected_page_index]
 
     def _load_pages(self):
         self.pages = [[] for _ in range(len(self.palette) // self.palette_size + 1)]
 
-        for index, color in self.palette.items():
+        for index, colour in self.palette.items():
             y, x = divmod(index % self.palette_size, (self.palette_size // 2))
 
             self.pages[index // self.palette_size].append(
-                PaletteColor(color.color, index, x, y)
+                PaletteColour(colour.colour, index, x, y)
             )
         if len(self.pages[-1]) == 0:
             del self.pages[-1]
@@ -44,14 +43,14 @@ class Palette:
         self._show = val
 
     def move_cursor(self, step: int):
-        index = self._check_color_index(self._selected_color + step)
+        index = self._check_colour_index(self._selected_colour + step)
         while self._selected_page[index % self.palette_size].completed:
-            index = self._check_color_index(index + step)
-            if all(color.completed for color in self._selected_page):
+            index = self._check_colour_index(index + step)
+            if all(colour.completed for colour in self._selected_page):
                 break
-        self.select_color(index)
+        self.select_colour(index)
 
-    def _check_color_index(self, index: int) -> int:
+    def _check_colour_index(self, index: int) -> int:
         if index == -1:
             index = len(self.palette) - 1
         elif index == len(self.palette):
@@ -63,9 +62,9 @@ class Palette:
         self._selected_page_index = index // self.palette_size
         self._selected_page = self.pages[index // self.palette_size]
 
-    def set_completed_color(self, index: int):
-        page, color = divmod(index, self.palette_size)
-        self.pages[page][color].completed = True
+    def set_completed_colour(self, index: int):
+        page, colour = divmod(index, self.palette_size)
+        self.pages[page][colour].completed = True
 
     def _arrow_button_handler(self, response: ButtonResponses):
         if response == ButtonResponses.LEFT_BTN:
@@ -86,26 +85,26 @@ class Palette:
     def draw(self, display: pygame.surface.Surface):
         if not self._show:
             return
-        pygame.draw.rect(display, GRAY_COLOR, (0, 400, 500, 100))
-        for color in self._selected_page:
-            response = color.draw(display)
+        pygame.draw.rect(display, GRAY_COLOUR, (0, 400, 500, 100))
+        for colour in self._selected_page:
+            response = colour.draw(display)
             if response is None:
                 continue
-            self.select_color(response)
+            self.select_colour(response)
         if response := self._arrow_button.draw(display):
             self._arrow_button_handler(response)
 
-        return self._selected_color
+        return self._selected_colour
 
-    def select_color(self, index: int):
-        color_index = abs(index) % self.palette_size
-        color = self._selected_page[color_index]
-        if color.completed:
+    def select_colour(self, index: int):
+        colour_index = abs(index) % self.palette_size
+        colour = self._selected_page[colour_index]
+        if colour.completed:
             return
-        page_index = self._selected_color % self.palette_size
+        page_index = self._selected_colour % self.palette_size
 
-        self.pages[self._selected_color_page][page_index].selected = False
-        self._selected_color = index
-        self._selected_color_page = self._selected_page_index
-        page_index = self._selected_color % self.palette_size
+        self.pages[self._selected_colour_page][page_index].selected = False
+        self._selected_colour = index
+        self._selected_colour_page = self._selected_page_index
+        page_index = self._selected_colour % self.palette_size
         self._selected_page[page_index].selected = True

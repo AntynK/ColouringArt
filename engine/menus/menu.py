@@ -3,23 +3,24 @@ from typing import Callable
 
 import pygame
 
-from ..static_variables import FPS, clock
-from ..colors import BLACK_COLOR
+from engine.static_variables import FPS, clock
+from engine.colours import BLACK_COLOUR
+from engine.handlers import check_colour_format
 
 
 class Menu:
     def __init__(self) -> None:
-        self.set_background_color(BLACK_COLOR)
-        self._alive = True
-        self._registered_keys: dict[int, tuple] = {}
+        self.set_background_colour(BLACK_COLOUR)
+        self._active = True
+        self._registered_keys: dict[int, Callable] = {}
 
         self.init()
 
-    def set_background_color(self, color: tuple[int, int, int]) -> None:
-        if isinstance(color, tuple) and len(color) == 3:
-            self._bg_color = color
+    def set_background_colour(self, colour: tuple[int, int, int]) -> None:
+        if check_colour_format(colour):
+            self._bg_colour = colour
         else:
-            raise ValueError("Background must be a tuple with 3 int values.")
+            raise ValueError(f"Wrong colour format:{colour}")
 
     def init(self):
         """
@@ -48,7 +49,7 @@ class Menu:
 
         pass
 
-    def on_key_pressed(self, key: int, callback: Callable, *arg):
+    def on_key_pressed(self, key: int, callback: Callable):
         """
         If key is pressed, callback is called.
 
@@ -57,23 +58,22 @@ class Menu:
             callback: Callable = any callable object.
         """
 
-        self._registered_keys[key] = (callback, arg)
+        self._registered_keys[key] = callback
 
     def show(self, display: pygame.surface.Surface):
         self.display = display
-        while self._alive:
+        while self._active:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if callback := self._registered_keys.get(event.key):
-                        func = callback[0]
-                        func(*callback[1])
+                        callback()
 
                 self.event_handler(event)
 
-            if self._bg_color:
-                display.fill(self._bg_color)
+            if self._bg_colour:
+                display.fill(self._bg_colour)
 
             self.display_updated()
 
@@ -81,4 +81,4 @@ class Menu:
             clock.tick(FPS)
 
     def close(self):
-        self._alive = False
+        self._active = False
